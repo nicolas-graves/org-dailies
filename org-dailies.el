@@ -319,7 +319,7 @@ In this case, interactive selection will be bypassed."
       (with-temp-buffer
         (insert (format "#+title: %s\n" (format-time-string "%Y-%m-%d" time)))
         (write-file daily-note-file)))
-    (org-capture goto (if keys keys "d"))
+    (org-capture (if goto '(4) nil) (if keys keys "d"))
     (when goto (run-hooks 'org-dailies-find-file-hook))))
 
 ;;; Bindings
