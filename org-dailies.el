@@ -2,7 +2,7 @@
 ;;;
 ;; Copyright © 2020-2022 Jethro Kuan <jethrokuan95@gmail.com>
 ;; Copyright © 2020 Leo Vivier <leo.vivier+dev@gmail.com>
-;; Copyright © 2020 Nicolas Graves <ngraves@ngraves.fr>
+;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 
 ;; Maintainer: Nicolas Graves <ngraves@ngraves.fr>
 ;; URL: https://git.sr.ht/~ngraves/org-dailies
@@ -38,8 +38,6 @@
 ;;
 ;; This package is an org-roam free copy of org-roam-dailies
 ;; extension, to avoid cluttering my database with journal notes.
-;;
-;; TODO Check that you can enable forward links but not backward links.
 
 ;;; Code:
 (require 'dash)
@@ -87,17 +85,73 @@ This path is absolute or relative to `org-directory'."
   :group 'org-dailies
   :type 'hook)
 
-;; TODO get closer to the original org-roam-dailies-capture-templates
-;; We define that as a local variable later to pass time.
-;; Suboptimal, but should work for now.
-;; (defcustom org-dailies-capture-templates
-
-;;   "Capture templates for daily-notes in Org.
-;; Note that for daily files to show up in the calendar, they have to be of format
-;; \"org-time-string.org\".
-;; See `org-capture-templates' for the template documentation."
-;;   :group 'org-dailies
-;;   :type 'list)
+(defcustom org-dailies-capture-templates
+  `(("d" "default" entry
+     "* %?"
+     :target (file+head "%<%Y-%m-%d>.org"
+                        "#+title: %<%Y-%m-%d>\n")))
+  "Capture templates for daily-notes in Org-roam.
+Note that for daily files to show up in the calendar, they have to be of format
+\"org-time-string.org\".
+See `org-capture-templates' for the template documentation."
+  :group 'org-dailies
+  :type '(repeat
+          (choice (list :tag "Multikey description"
+                        (string :tag "Keys       ")
+                        (string :tag "Description"))
+                  (list :tag "Template entry"
+                        (string :tag "Keys           ")
+                        (string :tag "Description    ")
+                        (choice :tag "Capture Type   " :value entry
+                                (const :tag "Org entry" entry)
+                                (const :tag "Plain list item" item)
+                                (const :tag "Checkbox item" checkitem)
+                                (const :tag "Plain text" plain)
+                                (const :tag "Table line" table-line))
+                        (choice :tag "Template       "
+                                (string)
+                                (list :tag "File"
+                                      (const :format "" file)
+                                      (file :tag "Template file"))
+                                (list :tag "Function"
+                                      (const :format "" function)
+                                      (function :tag "Template function")))
+                        (plist :inline t
+                               ;; Give the most common options as checkboxes
+                               :options (((const :format "%v " :target)
+                                          (choice :tag "Node location"
+                                                  (list :tag "File"
+                                                        (const :format "" file)
+                                                        (string :tag "  File"))
+                                                  (list :tag "File & Head Content"
+                                                        (const :format "" file+head)
+                                                        (string :tag "  File")
+                                                        (string :tag "  Head Content"))
+                                                  (list :tag "File & Outline path"
+                                                        (const :format "" file+olp)
+                                                        (string :tag "  File")
+                                                        (list :tag "Outline path"
+                                                              (repeat (string :tag "Headline"))))
+                                                  (list :tag "File & Head Content & Outline path"
+                                                        (const :format "" file+head+olp)
+                                                        (string :tag "  File")
+                                                        (string :tag "  Head Content")
+                                                        (list :tag "Outline path"
+                                                              (repeat (string :tag "Headline"))))))
+                                         ((const :format "%v " :prepend) (const t))
+                                         ((const :format "%v " :immediate-finish) (const t))
+                                         ((const :format "%v " :jump-to-captured) (const t))
+                                         ((const :format "%v " :empty-lines) (const 1))
+                                         ((const :format "%v " :empty-lines-before) (const 1))
+                                         ((const :format "%v " :empty-lines-after) (const 1))
+                                         ((const :format "%v " :clock-in) (const t))
+                                         ((const :format "%v " :clock-keep) (const t))
+                                         ((const :format "%v " :clock-resume) (const t))
+                                         ((const :format "%v " :time-prompt) (const t))
+                                         ((const :format "%v " :tree-type) (const week))
+                                         ((const :format "%v " :unnarrowed) (const t))
+                                         ((const :format "%v " :table-line-pos) (string))
+                                         ((const :format "%v " :kill-buffer) (const t))))))))
 
 ;;; Commands
 ;;;; Today
