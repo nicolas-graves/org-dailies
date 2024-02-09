@@ -40,7 +40,6 @@
 ;; extension, to avoid cluttering my database with journal notes.
 
 ;;; Code:
-(require 'dash)
 (require 'cl-lib)
 (require 'org)
 (require 'org-capture)
