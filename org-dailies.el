@@ -296,11 +296,12 @@ negative, find note N days in the future."
 EXTRA-FILES can be used to append extra files to the list."
   (let ((dir (org-dailies-directory))
         (regexp (rx-to-string `(and "." (or ,@org-dailies-file-extensions)))))
-    (append (--remove (let ((file (file-name-nondirectory it)))
-                        (when (or (auto-save-file-name-p file)
-                                  (backup-file-name-p file)
-                                  (string-match "^\\." file))
-                          it))
+    (append (seq-remove (lambda (it)
+                          (let ((file (file-name-nondirectory it)))
+                            (when (or (auto-save-file-name-p file)
+                                      (backup-file-name-p file)
+                                      (string-match "^\\." file))
+                              it)))
                       (directory-files-recursively dir regexp))
             extra-files)))
 
